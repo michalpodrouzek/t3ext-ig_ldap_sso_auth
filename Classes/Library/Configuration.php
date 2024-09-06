@@ -43,7 +43,7 @@ class Configuration
      */
     protected static $configuration;
 
-    protected static $mode = 'be';
+    protected static $mode;
     protected static $be = [];
     protected static $fe = [];
     protected static $ldap = [];
@@ -67,7 +67,7 @@ class Configuration
 
         static::$configuration = $configuration;
 
-        // Default TYPO3_MODE is BE
+        // Default TYPO3 MODE is BE
         static::setMode($mode ?: CompatUtility::getTypo3Mode());
 
         // Select configuration from database, merge with extension configuration template and initialise class attributes.
@@ -307,7 +307,7 @@ class Configuration
      *
      * @return string Either 'be' or 'fe'
      */
-    public static function getMode(): string
+    public static function getMode(): ?string
     {
         return static::$mode;
     }

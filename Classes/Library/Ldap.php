@@ -15,6 +15,7 @@
 namespace Causal\IgLdapSsoAuth\Library;
 
 use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Causal\IgLdapSsoAuth\Utility\LdapUtility;
@@ -42,9 +43,9 @@ class Ldap
     /**
      * @param LdapUtility $ldapUtility
      */
-    public function injectLdapUtility(LdapUtility $ldapUtility): void
+    public function __construct()
     {
-        $this->ldapUtility = $ldapUtility;
+        $this->ldapUtility = GeneralUtility::makeInstance(LdapUtility::class);
     }
 
     /**
@@ -55,12 +56,7 @@ class Ldap
      */
     public static function getInstance(): self
     {
-        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
-        static $objectManager = null;
-        if ($objectManager === null) {
-            $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
-        }
-        return $objectManager->get(__CLASS__);
+        return GeneralUtility::makeInstance(__CLASS__);
     }
 
     /**

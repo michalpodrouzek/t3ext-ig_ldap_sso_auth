@@ -64,8 +64,8 @@ class LdapSuggestElement extends AbstractFormElement
             $suggestId = 'tx_igldapssoauth_suggest_' . $this->data['fieldName'];
 
             $out[] = '<div style="margin:1em 0 0 1em; font-size:11px;">';
-            $fieldJs = '$("[data-formengine-input-name=\'data' . $this->data['elementBaseName'] . '\'").first()';
-            $onclick = "var node=document.getElementById('$suggestId');$fieldJs.val(node.innerText || node.textContent);$fieldJs.trigger('change');";
+            $fieldJs = 'document.querySelector("[data-formengine-input-name=\'data' . $this->data['elementBaseName'] . '\']")';
+            $onclick = "var node=document.getElementById('$suggestId'),input=$fieldJs;if(input){input.value=node.innerText||node.textContent;input.dispatchEvent(new Event('change',{bubbles:true}));}";
             $out[] = '<strong>' . htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:ig_ldap_sso_auth/Resources/Private/Language/locallang_db.xlf:suggestion.server.' . $serverType)) . '</strong>';
 
             $out[] = '<pre style="margin:1em 0;" id="' . $suggestId . '">';

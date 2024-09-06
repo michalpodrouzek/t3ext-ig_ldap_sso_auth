@@ -1,66 +1,45 @@
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
+import $ from 'jquery';
 
-/**
- * Module: TYPO3/CMS/IgLdapSsoAuth/Search
- */
-define([
-    'jquery'
-], function ($) {
-    'use strict';
+const IgLdapSsoAuthSearch = {
+    type: 'fe_users',
 
-    var IgLdapSsoAuthSearch = {
-        type: 'fe_users',
+    fields: {
+        form: null,
+        basedn: null,
+        filter: null,
+        result: null
+    },
 
-        fields: {
-            form: null,
-            basedn: null,
-            filter: null,
-            result: null
-        }
-    };
+    initialize() {
+        this.fields.form = $('#tx-igldapssoauth-searchform');
+        this.fields.basedn = $('#tx-igldapssoauth-basedn');
+        this.fields.filter = $('#tx-igldapssoauth-filter');
+        this.fields.result = $('#tx-igldapssoauth-result');
 
-    IgLdapSsoAuthSearch.initialize = function () {
-        IgLdapSsoAuthSearch.fields.form = $('#tx-igldapssoauth-searchform');
-        IgLdapSsoAuthSearch.fields.basedn = $('#tx-igldapssoauth-basedn');
-        IgLdapSsoAuthSearch.fields.filter = $('#tx-igldapssoauth-filter');
-        IgLdapSsoAuthSearch.fields.result = $('#tx-igldapssoauth-result');
-
-        IgLdapSsoAuthSearch.fields.form.submit(function (e) {
+        this.fields.form.submit((e) => {
             e.preventDefault(); // this will prevent from submitting the form
-            IgLdapSsoAuthSearch.search();
+            this.search();
         });
 
-        $(':radio').click(function () {
-            IgLdapSsoAuthSearch.updateForm($(this).val());
+        $(':radio').click((event) => {
+            this.updateForm($(event.currentTarget).val());
         });
 
-        $(':checkbox').click(function () {
-            IgLdapSsoAuthSearch.search();
+        $(':checkbox').click(() => {
+            this.search();
         });
 
-        $('#tx-igldapssoauth-search').click(function () {
-            IgLdapSsoAuthSearch.search();
+        $('#tx-igldapssoauth-search').click(() => {
+            this.search();
         });
 
-        if (IgLdapSsoAuthSearch.fields.form.length) {
-            IgLdapSsoAuthSearch.search();
+        if (this.fields.form.length) {
+            this.search();
         }
-    };
+    },
 
-    IgLdapSsoAuthSearch.updateForm = function (type) {
-        var self = IgLdapSsoAuthSearch;
-        self.type = type;
+    updateForm(type) {
+        this.type = type;
 
         $.ajax({
             url: TYPO3.settings.ajaxUrls['ldap_form_update'],
@@ -68,27 +47,27 @@ define([
                 configuration: $('#tx-igldapssoauth-result').data('configuration'),
                 type: type
             }
-        }).done(function (data) {
+        }).done((data) => {
             if (data.success) {
-                self.fields.basedn.val(data.configuration.basedn);
-                self.fields.filter.val(data.configuration.filter);
-                self.search();
+                this.fields.basedn.val(data.configuration.basedn);
+                this.fields.filter.val(data.configuration.filter);
+                this.search();
             }
         });
-    };
+    },
 
-    IgLdapSsoAuthSearch.search = function () {
-        var self = IgLdapSsoAuthSearch;
-
+    search() {
         $.ajax({
             url: TYPO3.settings.ajaxUrls['ldap_search'],
-            data: self.fields.form.serialize()
-        }).done(function (data) {
-            self.fields.result.html(data.html);
+            data: this.fields.form.serialize()
+        }).done((data) => {
+            this.fields.result.html(data.html);
         });
-    };
+    }
+};
 
-    $(IgLdapSsoAuthSearch.initialize);
-
-    return IgLdapSsoAuthSearch;
+$(document).ready(() => {
+    IgLdapSsoAuthSearch.initialize();
 });
+
+export default IgLdapSsoAuthSearch;

@@ -1,0 +1,11 @@
+# Configuration/Services.yaml
+services:
+  #Dependencies injection activation
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  Causal\IgLdapSsoAuth\:
+    resource: '../Classes/*'
+    exclude: ['../Classes/Domain/Model/*', '../Classes/Hooks/*', '../Classes/Utility/*', ]

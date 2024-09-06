@@ -135,7 +135,7 @@ class Typo3GroupRepository
             $table,
             $data
         );
-        $uid = $tableConnection->lastInsertId($table);
+        $uid = $tableConnection->lastInsertId();
 
         $newRow = $tableConnection
             ->select(

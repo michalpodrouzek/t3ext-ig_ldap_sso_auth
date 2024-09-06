@@ -220,8 +220,6 @@ class Authentication
                     if (isset($columnConfig['config']['default'])) {
                         $defaultValue = $columnConfig['config']['default'];
                         $typo3_user[$column] = $defaultValue;
-                    } elseif ($columnConfig['config']['type'] === 'group') {
-                        $typo3_user[$column] = '';
                     }
                 }
             }

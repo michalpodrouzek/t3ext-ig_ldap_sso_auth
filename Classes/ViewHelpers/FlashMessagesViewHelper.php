@@ -14,8 +14,15 @@
 
 namespace Causal\IgLdapSsoAuth\ViewHelpers;
 
-use TYPO3\CMS\Core\Messaging\FlashMessage;
+use Causal\IgLdapSsoAuth\Messaging\LdapFlashMessageRendererResolver;
+use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
+use TYPO3\CMS\Extbase\Service\ExtensionService;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 /**
  * Render a conf* View helper which renders the flash messages (if there are any).
@@ -24,58 +31,63 @@ use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
  * @package    TYPO3
  * @subpackage ig_ldap_sso_auth
  */
-class FlashMessagesViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FlashMessagesViewHelper
+class FlashMessagesViewHelper extends AbstractViewHelper
 {
+    use CompileWithRenderStatic;
 
     /**
-     * @var string The message severity class names
+     * ViewHelper outputs HTML therefore output escaping has to be disabled
+     *
+     * @var bool
      */
-    protected static $classes = [
-        FlashMessage::NOTICE => 'notice',
-        FlashMessage::INFO => 'info',
-        FlashMessage::OK => 'success',
-        FlashMessage::WARNING => 'warning',
-        FlashMessage::ERROR => 'danger'
-    ];
+    protected $escapeOutput = false;
 
-    /**
-     * @var string The message severity icon names
-     */
-    protected static $icons = [
-        FlashMessage::NOTICE => 'lightbulb-o',
-        FlashMessage::INFO => 'info',
-        FlashMessage::OK => 'check',
-        FlashMessage::WARNING => 'exclamation',
-        FlashMessage::ERROR => 'times'
-    ];
+    public function initializeArguments(): void
+    {
+        $this->registerArgument('queueIdentifier', 'string', 'Flash-message queue to use');
+        $this->registerArgument('as', 'string', 'The name of the current flashMessage variable for rendering inside');
+    }
 
     /**
      * Renders FlashMessages and flushes the FlashMessage queue
-     * Note: This disables the current page cache in order to prevent FlashMessage output
-     * from being cached.
      *
-     * @see \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController::no_cache
-     * @param array $arguments
-     * @param \Closure $renderChildrenClosure
-     * @param RenderingContextInterface $renderingContext
+     * Note: This does not disable the current page cache in order to prevent FlashMessage output
+     *       from being cached.
+     *       In case of conditional flash message rendering, caching must be disabled
+     *       (e.g. for a controller action).
+     *       Custom caching using the Caching Framework can be used in this case.
+     *
      * @return mixed
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
         $as = $arguments['as'];
-        $queueIdentifier = isset($arguments['queueIdentifier']) ? $arguments['queueIdentifier'] : null;
-        $flashMessages = $renderingContext->getControllerContext()
-            ->getFlashMessageQueue($queueIdentifier)->getAllMessagesAndFlush();
-        if ($flashMessages === null || empty($flashMessages)) {
+        $queueIdentifier = $arguments['queueIdentifier'];
+
+        if ($queueIdentifier === null) {
+            /** @var RenderingContext $renderingContext */
+            $request = $renderingContext->getRequest();
+            if (!$request instanceof RequestInterface) {
+                // Throw if not an extbase request
+                throw new \RuntimeException(
+                    'ViewHelper f:flashMessages needs an extbase Request object to resolve the Queue identifier magically.'
+                    . ' When not in extbase context, set attribute "queueIdentifier".',
+                    1639821269
+                );
+            }
+            $extensionService = GeneralUtility::makeInstance(ExtensionService::class);
+            $pluginNamespace = $extensionService->getPluginNamespace($request->getControllerExtensionName(), $request->getPluginName());
+            $queueIdentifier = 'extbase.flashmessages.' . $pluginNamespace;
+        }
+
+        $flashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)->getMessageQueueByIdentifier($queueIdentifier);
+        $flashMessages = $flashMessageQueue->getAllMessagesAndFlush();
+        if (count($flashMessages) === 0) {
             return '';
         }
 
         if ($as === null) {
-            $out = [];
-            foreach ($flashMessages as $flashMessage) {
-                $out[] = static::renderFlashMessage($flashMessage);
-            }
-            return implode(LF, $out);
+            return GeneralUtility::makeInstance(LdapFlashMessageRendererResolver::class)->resolve()->render($flashMessages);
         }
         $templateVariableContainer = $renderingContext->getVariableProvider();
         $templateVariableContainer->add($as, $flashMessages);
@@ -83,35 +95,5 @@ class FlashMessagesViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FlashMessages
         $templateVariableContainer->remove($as);
 
         return $content;
-    }
-
-    /**
-     * @param FlashMessage $flashMessage
-     * @return string
-     */
-    protected static function renderFlashMessage(FlashMessage $flashMessage): string
-    {
-        $className = 'alert-' . static::$classes[$flashMessage->getSeverity()];
-        $iconName = 'fa-' . static::$icons[$flashMessage->getSeverity()];
-
-        $messageTitle = $flashMessage->getTitle();
-        $markup = [];
-        $markup[] = '<div class="alert ' . $className . '">';
-        $markup[] = '    <div class="media">';
-        $markup[] = '        <div class="media-left">';
-        $markup[] = '            <span class="fa-stack fa-lg">';
-        $markup[] = '                <i class="fa fa-circle fa-stack-2x"></i>';
-        $markup[] = '                <i class="fa ' . $iconName . ' fa-stack-1x"></i>';
-        $markup[] = '            </span>';
-        $markup[] = '        </div>';
-        $markup[] = '        <div class="media-body">';
-        if (!empty($messageTitle)) {
-            $markup[] = '            <h4 class="alert-title">' . htmlspecialchars($messageTitle) . '</h4>';
-        }
-        $markup[] = '            <p class="alert-message">' . $flashMessage->getMessage() . '</p>';
-        $markup[] = '        </div>';
-        $markup[] = '    </div>';
-        $markup[] = '</div>';
-        return implode('', $markup);
     }
 }

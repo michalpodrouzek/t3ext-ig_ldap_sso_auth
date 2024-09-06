@@ -22,9 +22,6 @@ final class CompatUtility
 {
     public static function getTypo3Mode(): ?string
     {
-        if (defined('TYPO3_MODE')) {
-            return TYPO3_MODE;
-        }
 
         $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
         if ($request !== null) {

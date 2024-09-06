@@ -14,8 +14,10 @@
 
 namespace Causal\IgLdapSsoAuth\ViewHelpers;
 
+use Causal\IgLdapSsoAuth\Hooks\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * Render a configuration table
@@ -24,7 +26,7 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  * @package    TYPO3
  * @subpackage ig_ldap_sso_auth
  */
-class ConfigurationTableViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper
+class ConfigurationTableViewHelper extends AbstractViewHelper
 {
     /**
      * @var bool
@@ -34,7 +36,7 @@ class ConfigurationTableViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\Abs
     /**
      * Initialize arguments
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('data', 'mixed', 'Data as array or string', true);
         $this->registerArgument('humanKeyNames', 'bool', 'Use human key names', false, false);
@@ -151,10 +153,10 @@ class ConfigurationTableViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\Abs
             $options = [
                 'title' => 'id=' . $value->getUid(),
             ];
-            /** @var \Causal\IgLdapSsoAuth\Hooks\IconFactory $iconFactoryHook */
+            /** @var IconFactory $iconFactoryHook */
             static $iconFactoryHook = null;
             if ($iconFactoryHook === null) {
-                $iconFactoryHook = GeneralUtility::makeInstance(\Causal\IgLdapSsoAuth\Hooks\IconFactory::class);
+                $iconFactoryHook = GeneralUtility::makeInstance(IconFactory::class);
             }
             $overlay = $iconFactoryHook->postOverlayPriorityLookup(
                 $table,

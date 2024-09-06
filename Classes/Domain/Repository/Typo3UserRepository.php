@@ -186,7 +186,7 @@ class Typo3UserRepository
             $data
         );
 
-        $uid = $tableConnection->lastInsertId($table);
+        $uid = $tableConnection->lastInsertId();
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable($table);
@@ -460,7 +460,7 @@ class Typo3UserRepository
         /** @var \TYPO3\CMS\Saltedpasswords\Salt\SaltInterface $instance */
         $instance = null;
         if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('saltedpasswords')) {
-            $instance = \TYPO3\CMS\Saltedpasswords\Salt\SaltFactory::getSaltingInstance(null, CompatUtility::getTypo3Mode());
+            $instance = \TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory::get(null, CompatUtility::getTypo3Mode());
         }
         $password = GeneralUtility::makeInstance(Random::class)->generateRandomBytes(16);
         $password = $instance ? $instance->getHashedPassword($password) : md5($password);

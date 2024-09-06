@@ -201,7 +201,7 @@ class ModuleController extends ActionController
         $this->populateView($configuration);
         $this->addMainMenu('search', ['configuration' => $configuration->getUid()]);
 
-        $this->pageRenderer->loadJavaScriptModule('@michalpodrouzek/ig_ldap_sso_auth/search.js');
+        $this->pageRenderer->loadJavaScriptModule('@causal/ig_ldap_sso_auth/search.js');
 
         $frontendConfiguration = Configuration::getFrontendConfiguration();
         $this->moduleTemplate->assignMultiple([
@@ -276,7 +276,7 @@ class ModuleController extends ActionController
             return $this->moduleTemplate->renderResponse();
         }
 
-        $this->pageRenderer->loadJavaScriptModule('@michalpodrouzek/ig_ldap_sso_auth/import.js');
+        $this->pageRenderer->loadJavaScriptModule('@causal/ig_ldap_sso_auth/import.js');
 
         if ($entity === 'users') {
             $data = $this->getAvailableUsers($configuration, $type);

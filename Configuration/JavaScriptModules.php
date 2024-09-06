@@ -6,6 +6,6 @@ return [
         'core',
     ],
     'imports' => [
-        '@michalpodrouzek/ig_ldap_sso_auth/' => 'EXT:ig_ldap_sso_auth/Resources/Public/JavaScript/',
+        '@causal/ig_ldap_sso_auth/' => 'EXT:ig_ldap_sso_auth/Resources/Public/JavaScript/',
     ],
 ];

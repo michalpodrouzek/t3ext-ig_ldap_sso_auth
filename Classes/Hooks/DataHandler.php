@@ -45,7 +45,7 @@ class DataHandler
         $id,
         array $fieldArray,
         \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
-    )
+    ): void
     {
         if ($table !== 'tx_igldapssoauth_config') {
             // Early return
@@ -80,7 +80,7 @@ class DataHandler
                     FlashMessage::class,
                     htmlspecialchars($this->getLanguageService()->sL('LLL:EXT:ig_ldap_sso_auth/Resources/Private/Language/locallang_db.xlf:' . $key)),
                     '',
-                    FlashMessage::WARNING,
+                    \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::WARNING,
                     true
                 );
                 /** @var FlashMessageService $flashMessageService */

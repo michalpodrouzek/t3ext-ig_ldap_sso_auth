@@ -61,7 +61,7 @@ class Authentication
      * @param AuthenticationService $authenticationService
      * @return void
      */
-    public static function setAuthenticationService(AuthenticationService $authenticationService)
+    public static function setAuthenticationService(AuthenticationService $authenticationService): void
     {
         static::$authenticationService = $authenticationService;
     }
@@ -234,7 +234,7 @@ class Authentication
             // to authenticate is to set a "stop time" (endtime in DB) to the TYPO3 user record or
             // mark it as "disable"
             $typo3_user['deleted'] = 0;
-            if ($typo3_user['endtime'] < $GLOBALS['EXEC_TIME']) {
+            if ($typo3_user['endtime'] < \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp')) {
                 // Reset the stop time since we seem to want to restore a previously deleted account
                 $typo3_user['endtime'] = 0;
             }
@@ -243,13 +243,13 @@ class Authentication
 
             if ((empty($typo3_groups) && Configuration::getValue('DeleteUserIfNoTYPO3Groups'))) {
                 $typo3_user['deleted'] = 1;
-                $typo3_user['endtime'] = $GLOBALS['EXEC_TIME'];
+                $typo3_user['endtime'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
                 static::getLogger()->debug('User record has been deleted because she has no associated TYPO3 groups.', $typo3_user);
             }
             // Delete user if no LDAP groups found.
             if (Configuration::getValue('DeleteUserIfNoLDAPGroups') && !static::$ldapGroups) {
                 $typo3_user['deleted'] = 1;
-                $typo3_user['endtime'] = $GLOBALS['EXEC_TIME'];
+                $typo3_user['endtime'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
                 static::getLogger()->debug('User record has been deleted because she has no LDAP groups.', $typo3_user);
             }
             // Set groups to user.
@@ -270,8 +270,8 @@ class Authentication
                 $typo3_user['tx_igldapssoauth_from'] = 'LDAP';
 
                 if ((bool)$typo3_user['deleted']
-                    || ($typo3_user['starttime'] > 0 && $typo3_user['starttime'] > $GLOBALS['EXEC_TIME'])
-                    || ($typo3_user['endtime'] > 0 && $typo3_user['endtime'] <= $GLOBALS['EXEC_TIME'])) {
+                    || ($typo3_user['starttime'] > 0 && $typo3_user['starttime'] > \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp'))
+                    || ($typo3_user['endtime'] > 0 && $typo3_user['endtime'] <= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp'))) {
                     // User has been updated in TYPO3, but it should not be granted to get an actual session
                     $typo3_user = false;
                 }
@@ -553,8 +553,8 @@ class Authentication
 
             $user['pid'] = (int)$pid;
             $user['cruser_id'] = static::getCreationUserId();
-            $user['crdate'] = $GLOBALS['EXEC_TIME'];
-            $user['tstamp'] = $GLOBALS['EXEC_TIME'];
+            $user['crdate'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
+            $user['tstamp'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
             $user['username'] = $username;
             $user['tx_igldapssoauth_dn'] = $userDn;
         }
@@ -599,8 +599,8 @@ class Authentication
                 $typo3Group = Typo3GroupRepository::create($table);
                 $typo3Group['pid'] = (int)$pid;
                 $typo3Group['cruser_id'] = static::getCreationUserId();
-                $typo3Group['crdate'] = $GLOBALS['EXEC_TIME'];
-                $typo3Group['tstamp'] = $GLOBALS['EXEC_TIME'];
+                $typo3Group['crdate'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
+                $typo3Group['tstamp'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
             }
 
             $typo3Groups[] = $typo3Group;
@@ -646,8 +646,8 @@ class Authentication
                 $typo3User = Typo3UserRepository::create($table);
                 $typo3User['pid'] = (int)$pid;
                 $user['cruser_id'] = static::getCreationUserId();
-                $typo3User['crdate'] = $GLOBALS['EXEC_TIME'];
-                $typo3User['tstamp'] = $GLOBALS['EXEC_TIME'];
+                $typo3User['crdate'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
+                $typo3User['tstamp'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
             }
 
             $typo3Users[] = $typo3User;
@@ -788,7 +788,7 @@ class Authentication
         if (preg_match("`{([^$]*)}`", $value, $matches)) {
             switch ($value) {
                 case '{DATE}':
-                    $mappedValue = $GLOBALS['EXEC_TIME'];
+                    $mappedValue = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp');
                     break;
                 case '{RAND}':
                     $mappedValue = rand();

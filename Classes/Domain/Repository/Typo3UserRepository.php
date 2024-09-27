@@ -109,11 +109,7 @@ class Typo3UserRepository
             // Search with uid
             $users = $queryBuilder
                 ->select('*')
-                ->from($table)
-                ->where(
-                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
-                )
-                ->execute()
+                ->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))->executeQuery()
                 ->fetchAllAssociative();
         } elseif (!empty($dn)) {
             // Search with DN (or fall back to username) and pid
@@ -121,40 +117,27 @@ class Typo3UserRepository
             if (!empty($username)) {
                 // This additional condition will automatically add the mapping between
                 // a local user unrelated to LDAP and a corresponding LDAP user
-                $where = $queryBuilder->expr()->orX(
-                    $where,
-                    $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, \PDO::PARAM_STR))
-                );
+                $where = $queryBuilder->expr()->or($where, $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, \PDO::PARAM_STR)));
             }
             if (!empty($pid)) {
-                $where = $queryBuilder->expr()->andX(
-                    $where,
-                    $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter($pid, \PDO::PARAM_INT))
-                );
+                $where = $queryBuilder->expr()->and($where, $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter($pid, \PDO::PARAM_INT)));
             }
 
             $users = $queryBuilder
                 ->select('*')
                 ->from($table)
                 ->where($where)
-                ->orderBy('tx_igldapssoauth_dn', 'DESC')    // rows from LDAP first...
-                ->addOrderBy('deleted', 'ASC')              // ... then privilege active records
-                ->execute()
+                ->orderBy('tx_igldapssoauth_dn', 'DESC')->addOrderBy('deleted', 'ASC')->executeQuery()
                 ->fetchAllAssociative();
         } elseif (!empty($username)) {
             // Search with username and pid
             $where = $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username, \PDO::PARAM_STR));
             if (!empty($pid)) {
-                $where = $queryBuilder->expr()->andX(
-                    $where,
-                    $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter($pid, \PDO::PARAM_INT))
-                );
+                $where = $queryBuilder->expr()->and($where, $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter($pid, \PDO::PARAM_INT)));
             }
             $users = $queryBuilder
                 ->select('*')
-                ->from($table)
-                ->where($where)
-                ->execute()
+                ->from($table)->where($where)->executeQuery()
                 ->fetchAllAssociative();
         }
 
@@ -193,11 +176,7 @@ class Typo3UserRepository
         $queryBuilder->getRestrictions()->removeAll();
         $newRow = $queryBuilder
             ->select('*')
-            ->from($table)
-            ->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
-            )
-            ->execute()
+            ->from($table)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))->executeQuery()
             ->fetchAssociative();
 
         NotificationUtility::dispatch(
@@ -277,12 +256,7 @@ class Typo3UserRepository
 
             $uids = $queryBuilder
                 ->select('uid')
-                ->from($table)
-                ->where(
-                    $queryBuilder->expr()->eq('tx_igldapssoauth_id', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)),
-                    $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['disabled'], 0)
-                )
-                ->execute()
+                ->from($table)->where($queryBuilder->expr()->eq('tx_igldapssoauth_id', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)), $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['disabled'], 0))->executeQuery()
                 ->fetchFirstColumn();
 
             $queryBuilder
@@ -294,7 +268,7 @@ class Typo3UserRepository
                 ->set($GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['disabled'], 1);
 
             if (isset($GLOBALS['TCA'][$table]['ctrl']['tstamp'])) {
-                $queryBuilder->set($GLOBALS['TCA'][$table]['ctrl']['tstamp'], $GLOBALS['EXEC_TIME']);
+                $queryBuilder->set($GLOBALS['TCA'][$table]['ctrl']['tstamp'], \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp'));
             }
 
             $queryBuilder->execute();
@@ -331,12 +305,7 @@ class Typo3UserRepository
 
             $uids = $queryBuilder
                 ->select('uid')
-                ->from($table)
-                ->where(
-                    $queryBuilder->expr()->eq('tx_igldapssoauth_id', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)),
-                    $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['delete'], 0)
-                )
-                ->execute()
+                ->from($table)->where($queryBuilder->expr()->eq('tx_igldapssoauth_id', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)), $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['delete'], 0))->executeQuery()
                 ->fetchFirstColumn();
 
             $queryBuilder
@@ -348,7 +317,7 @@ class Typo3UserRepository
                 ->set($GLOBALS['TCA'][$table]['ctrl']['delete'], 1);
 
             if (isset($GLOBALS['TCA'][$table]['ctrl']['tstamp'])) {
-                $queryBuilder->set($GLOBALS['TCA'][$table]['ctrl']['tstamp'], $GLOBALS['EXEC_TIME']);
+                $queryBuilder->set($GLOBALS['TCA'][$table]['ctrl']['tstamp'], \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp'));
             }
 
             $queryBuilder->execute();
@@ -399,12 +368,7 @@ class Typo3UserRepository
                     ->getQueryBuilderForTable($table);
                 $rows = $queryBuilder
                     ->select('uid')
-                    ->from($table)
-                    ->where(
-                        $queryBuilder->expr()->in('uid', $usergroup),
-                        $queryBuilder->expr()->eq('tx_igldapssoauth_dn', $queryBuilder->createNamedParameter('', \PDO::PARAM_STR))
-                    )
-                    ->execute()
+                    ->from($table)->where($queryBuilder->expr()->in('uid', $usergroup), $queryBuilder->expr()->eq('tx_igldapssoauth_dn', $queryBuilder->createNamedParameter('', \PDO::PARAM_STR)))->executeQuery()
                     ->fetchAllAssociative();
                 foreach ($rows as $row) {
                     $localUserGroups[] = $row['uid'];

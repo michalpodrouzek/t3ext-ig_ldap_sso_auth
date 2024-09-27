@@ -46,10 +46,7 @@ class ConfigurationConverter extends AbstractTypeConverter implements SingletonI
      */
     protected $configurationRepository;
 
-    /**
-     * @param ConfigurationRepository $configurationRepository
-     */
-    public function injectConfigurationRepository(ConfigurationRepository $configurationRepository): void
+    public function __construct(\Causal\IgLdapSsoAuth\Domain\Repository\ConfigurationRepository $configurationRepository)
     {
         $this->configurationRepository = $configurationRepository;
     }

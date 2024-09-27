@@ -17,16 +17,14 @@ In case of use in an intranet environment, this extension is a perfect match sin
     'category' => 'services',
     'version' => '3.8.0-dev',
     'state' => 'stable',
-    'uploadfolder' => 0,
-    'createDirs' => '',
     'clearcacheonload' => 0,
     'author' => 'Xavier Perseguers',
     'author_email' => 'xavier@causal.ch',
     'author_company' => '',
     'constraints' => [
         'depends' => [
-            'php' => '7.4.0-8.2.99',
-            'typo3' => '10.4.0-12.4.99',
+            'php' => '8.1.0-8.2.99',
+            'typo3' => '12.4.0-12.4.99',
         ],
         'conflicts' => [],
         'suggests' => [],

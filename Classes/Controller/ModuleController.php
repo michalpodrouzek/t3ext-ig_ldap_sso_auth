@@ -107,7 +107,7 @@ class ModuleController extends ActionController
         $shortcutButton = $buttonBar->makeShortcutButton()
             ->setRouteIdentifier('txigldapssoauthM1')
             ->setArguments(['action' => 'index'])
-            ->setDisplayName(LocalizationUtility::translate('LLL:EXT:ig_ldap_sso_auth/Resources/Private/Language/locallang.xlf:mlang_tabs_tab', 'ig_ldap_sso_auth'));
+            ->setDisplayName(LocalizationUtility::translate('LLL:EXT:ig_ldap_sso_auth/Resources/Private/Language/locallang.xlf:mlang_tabs_tab', 'IgLdapSsoAuth'));
         $buttonBar->addButton($shortcutButton, ButtonBar::BUTTON_POSITION_RIGHT);
 
         return $this->moduleTemplate->renderResponse();
@@ -333,7 +333,7 @@ class ModuleController extends ActionController
             $menu->makeMenuItem()
                 ->setTitle(LocalizationUtility::translate(
                     'LLL:EXT:ig_ldap_sso_auth/Resources/Private/Language/locallang.xlf:' . $labelKey,
-                    'ig_ldap_sso_auth'
+                    'IgLdapSsoAuth'
                 ))
                 ->setHref($this->uriBuilder->uriFor($action, $additionalParameters))
                 ->setActive($currentAction === $action)
@@ -502,7 +502,7 @@ class ModuleController extends ActionController
      */
     protected function translate(string $id, array $arguments = null): string
     {
-        $value = LocalizationUtility::translate($id, 'ig_ldap_sso_auth', $arguments);
+        $value = LocalizationUtility::translate($id, 'IgLdapSsoAuth', $arguments);
         return $value ?? $id;
     }
 

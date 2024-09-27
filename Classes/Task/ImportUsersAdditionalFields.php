@@ -165,7 +165,7 @@ class ImportUsersAdditionalFields implements AdditionalFieldProviderInterface
         $fieldID = 'task_' . $fieldName;
         $typo3Branch = class_exists(\TYPO3\CMS\Core\Information\Typo3Version::class)
             ? (new \TYPO3\CMS\Core\Information\Typo3Version())->getBranch()
-            : TYPO3_branch;
+            : \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class)->getBranch();
         $cssClass = version_compare($typo3Branch, '11.0', '<') ? 'form-control' : 'form-select';
         if (isset($parameters['css'])) {
             $cssClass .= ' ' . $parameters['css'];
@@ -219,7 +219,7 @@ class ImportUsersAdditionalFields implements AdditionalFieldProviderInterface
      * @param AbstractTask $task Reference to the scheduler backend module
      * @return void
      */
-    public function saveAdditionalFields(array $submittedData, AbstractTask $task)
+    public function saveAdditionalFields(array $submittedData, AbstractTask $task): void
     {
         /** @var \Causal\IgLdapSsoAuth\Task\ImportUsers $task */
         $task->setMode($submittedData['tx_igldapssoauth_mode']);

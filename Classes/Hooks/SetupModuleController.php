@@ -30,7 +30,7 @@ class SetupModuleController
      * @param array $params
      * @param \TYPO3\CMS\Setup\Controller\SetupModuleController $pObj
      */
-    public function preprocessData(array $params, \TYPO3\CMS\Setup\Controller\SetupModuleController $pObj)
+    public function preprocessData(array $params, \TYPO3\CMS\Setup\Controller\SetupModuleController $pObj): void
     {
         if (empty($GLOBALS['BE_USER']->user['tx_igldapssoauth_dn'])) {
             return;

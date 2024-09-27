@@ -36,11 +36,11 @@ class DatabaseRecordListIconUtility implements RecordListGetTableHookInterface
      * @param int $pageId The record's page ID
      * @param string $additionalWhereClause An additional WHERE clause
      * @param string $selectedFieldsList Comma separated list of selected fields
-     * @param \TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList $parentObject
+     * @param \TYPO3\CMS\Backend\RecordList\DatabaseRecordList $parentObject
      * @return void
      * @see \TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::getTable()
      */
-    public function getDBlistQuery($table, $pageId, &$additionalWhereClause, &$selectedFieldsList, &$parentObject)
+    public function getDBlistQuery($table, $pageId, &$additionalWhereClause, &$selectedFieldsList, &$parentObject): void
     {
         if (GeneralUtility::inList('be_groups,be_users,fe_groups,fe_users', $table)) {
             $selectedFieldsList .= ',tx_igldapssoauth_dn';

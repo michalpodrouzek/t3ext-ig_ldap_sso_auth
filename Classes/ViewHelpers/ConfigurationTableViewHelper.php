@@ -193,7 +193,7 @@ class ConfigurationTableViewHelper extends AbstractViewHelper
      */
     protected function translate(string $id, ?array $arguments = null): ?string
     {
-        $value = LocalizationUtility::translate($id, 'ig_ldap_sso_auth', $arguments);
+        $value = LocalizationUtility::translate($id, 'IgLdapSsoAuth', $arguments);
         return $value !== null ? $value : $id;
     }
 }

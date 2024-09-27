@@ -47,9 +47,9 @@ class DomainItemsProcFunc
             static function (array $row) {
                 return [
                     // displayed value
-                    $row['domainName'],
+                    'label' => $row['domainName'],
                     // stored value
-                    $row['uid']
+                    'value' => $row['uid']
                 ];
             },
             $rows

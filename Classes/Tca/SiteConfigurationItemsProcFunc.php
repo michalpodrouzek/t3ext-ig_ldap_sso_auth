@@ -54,9 +54,9 @@ class SiteConfigurationItemsProcFunc
                 }
                 return [
                     // displayed value
-                    $host,
+                    'label' => $host,
                     // stored value
-                    $site->getIdentifier()
+                    'value' => $site->getIdentifier()
                 ];
             },
             $allSites

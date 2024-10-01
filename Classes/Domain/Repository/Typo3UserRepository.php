@@ -271,7 +271,7 @@ class Typo3UserRepository
                 $queryBuilder->set($GLOBALS['TCA'][$table]['ctrl']['tstamp'], \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp'));
             }
 
-            $queryBuilder->execute();
+            $queryBuilder->executeStatement();
 
             NotificationUtility::dispatch(
                 __CLASS__,
@@ -320,7 +320,7 @@ class Typo3UserRepository
                 $queryBuilder->set($GLOBALS['TCA'][$table]['ctrl']['tstamp'], \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Context\Context::class)->getPropertyFromAspect('date', 'timestamp'));
             }
 
-            $queryBuilder->execute();
+            $queryBuilder->executeStatement();
 
             NotificationUtility::dispatch(
                 __CLASS__,
